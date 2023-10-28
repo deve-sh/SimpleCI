@@ -7,6 +7,7 @@ import {
 	onAuthStateChanged,
 	type User,
 	type Auth,
+	type OAuthCredential,
 } from "firebase/auth";
 
 import { useStore } from "zustand";
@@ -33,21 +34,29 @@ interface AuthStoreState {
 	setReady: (ready: boolean) => void;
 	signingIn: boolean;
 	setSigningIn: (signingIn: boolean) => void;
+	oauthCredentials: OAuthCredential | null;
+	setOAuthCredentials: (credentials: OAuthCredential | null) => void;
 }
 
 export const authStore = createStore(
 	persist<AuthStoreState>(
 		(set) => ({
 			user: null,
+			oauthCredentials: null,
 			ready: false,
 			setUser: (user) => set({ user }),
 			setReady: (ready) => set({ ready }),
+			setOAuthCredentials: (oauthCredentials) => set({ oauthCredentials }),
 			signingIn: false,
 			setSigningIn: (signingIn) => set({ signingIn }),
 		}),
 		{
 			name: "simpleci-auth-store",
-			partialize: (state) => ({ user: state.user } as AuthStoreState),
+			partialize: (state) =>
+				({
+					user: state.user,
+					oauthCredentials: state.oauthCredentials,
+				} as AuthStoreState),
 		}
 	)
 );
@@ -69,7 +78,11 @@ class AuthProvider {
 		this.unsubscribeFromAuthChanges = this.onAuthStateChanged((user) => {
 			this.authStore.getState().setReady(true);
 
-			if (!user) return this.authStore.getState().setUser(null);
+			if (!user) {
+				this.authStore.getState().setOAuthCredentials(null);
+				this.authStore.getState().setUser(null);
+				return;
+			}
 			this.authStore.getState().setUser({
 				displayName: user.displayName,
 				uid: user.uid,
@@ -101,10 +114,24 @@ class AuthProvider {
 		try {
 			const provider = mode === "github" ? this.gitHubProvider : null;
 			if (!provider) throw new Error("Invalid sign in mode");
-			return {
-				data: await signInWithPopup(this.internalAuthProvider, provider),
-				error: null,
-			};
+
+			const signInResult = await signInWithPopup(
+				this.internalAuthProvider,
+				provider
+			);
+
+			// Get OAuth token from the provider for credential result.
+			const oauthSupportedProvider =
+				mode === "github" ? GithubAuthProvider : null;
+
+			if (oauthSupportedProvider) {
+				this.authStore
+					.getState()
+					.setOAuthCredentials(
+						oauthSupportedProvider.credentialFromResult(signInResult)
+					);
+			}
+			return { data: signInResult, error: null };
 		} catch (error) {
 			return { data: null, error };
 		}
