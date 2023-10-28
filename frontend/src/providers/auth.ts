@@ -146,13 +146,13 @@ class AuthProvider {
 		}
 	};
 
-	onAuthStateChanged(callback: (user: User | null) => unknown) {
+	onAuthStateChanged = (callback: (user: User | null) => unknown) => {
 		return onAuthStateChanged(this.internalAuthProvider, callback);
-	}
+	};
 
-	destroy() {
+	destroy = () => {
 		this.unsubscribeFromAuthChanges();
-	}
+	};
 }
 
 export default new AuthProvider();
