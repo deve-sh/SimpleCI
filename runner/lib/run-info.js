@@ -11,6 +11,14 @@ class RunInfo {
 	 * @type {{stepName:string, id: string, from: string; to: string; logPool: { type: typeof this.status, log: string, ts: string; }[] }[]}
 	 */
 	stepsInfo = [];
+	/**
+	 * @type {Record<string, string>}
+	 */
+	context = {};
+	/**
+	 * @type {Record<string, string>}
+	 */
+	env = {};
 
 	constructor() {}
 
