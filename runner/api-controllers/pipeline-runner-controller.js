@@ -13,8 +13,17 @@ const pipelineRunnerController = async (
 	if (runIdIdempotencyMap.has(runId)) return;
 	runIdIdempotencyMap.add(runId);
 
+	const admin = require("../firebase/admin");
+
+	const runDocumentData = (
+		await admin.firestore().collection("runs").doc(runId).get()
+	).data();
+	if (!runDocumentData) return;
+
+	const initialData = runDocumentData.initialData;
+
 	const executePipeline = require("../lib/pipeline-executor");
-	return executePipeline({ runId });
+	return executePipeline(initialData);
 };
 
 module.exports = pipelineRunnerController;

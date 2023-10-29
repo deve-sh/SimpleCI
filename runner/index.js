@@ -39,6 +39,36 @@ exports.pipelineRunnerLarge = functions
 	});
 
 // Write the required documents to trigger a pipeline runner from this webhook cloud function.
-exports.gitHubWebhook = functions.https.onRequest((req, res) => {
-	return res.send({});
+exports.gitHubWebhook = functions.https.onRequest(async (req, res) => {
+	try {
+		const admin = require("./firebase/admin");
+		const batch = admin.firestore().batch();
+		const runId = admin.firestore().doc().id;
+		batch.set(admin.firestore().collection("runs").doc(runId), {
+			runId,
+			// TODO: Fill in the following bits of information from the correct sources
+			initialData: {
+				runId,
+				repositoryURI: "https://github.com/deve-sh/greenlock-trial.git",
+				steps: [
+					{
+						name: "Install dependencies",
+						condition: "context.event == 'push'",
+						run: ['echo "Starting installation"', "npm install"],
+					},
+				],
+				projectId: "",
+				env: { ENABLE_DEPLOYS: "true" },
+				context: { event: "push", branchName: "" },
+			},
+		});
+		batch.set(
+			admin.firestore().collection("ci-job-runs-queue").doc("standard"),
+			{ runId }
+		);
+		await batch.commit();
+		return res.send({ success: true });
+	} catch {
+		return res.send({ success: false });
+	}
 });
