@@ -29,7 +29,7 @@ const getRepoURLWithToken = (repositoryURI, token) => {
  * @type {(initialData: { repositoryURI: string, token?: string, context: { branchName?: string; } }) => Promise<void>}
  */
 const cloneRepo = (initialData) =>
-	new Promise((resolve) => {
+	new Promise((resolve, reject) => {
 		const cloningCommand = `git clone ${getRepoURLWithToken(
 			initialData.repositoryURI,
 			initialData.token
@@ -39,7 +39,10 @@ const cloneRepo = (initialData) =>
 				: ""
 		} ../ci-cd-app`;
 		const process = new SpawnedProcess(cloningCommand);
-		process.on("complete", resolve);
+		process.on("complete", (status) => {
+			if (status === "errored") return reject();
+			return resolve();
+		});
 	});
 
 module.exports = cloneRepo;

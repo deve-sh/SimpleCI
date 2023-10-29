@@ -15,9 +15,13 @@ const setupEnvAndContexts = async (initialData) => {
 
 		for (const variableName in runInfo.env) {
 			if (runInfo.env.hasOwnProperty(variableName)) {
-				new SpawnedProcess(
+				const process = new SpawnedProcess(
 					`export ${variableName}=${runInfo.env[variableName]}`
 				);
+				process.on("complete", (status) => {
+					if (status === "errored")
+						throw new Error("Error setting environment variables");
+				});
 			}
 		}
 	}
@@ -25,9 +29,13 @@ const setupEnvAndContexts = async (initialData) => {
 	const unsetAddedEnvironmentVariables = () => {
 		for (const variableName in initialData.env) {
 			if (initialData.env.hasOwnProperty(variableName)) {
-				new SpawnedProcess(
+				const process = new SpawnedProcess(
 					`unset ${variableName}=${initialData.env[variableName]}`
 				);
+				process.on("complete", (status) => {
+					if (status === "errored")
+						throw new Error("Error un-setting environment variables");
+				});
 			}
 		}
 	};
