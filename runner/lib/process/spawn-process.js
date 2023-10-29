@@ -54,10 +54,12 @@ class SpawnedProcess {
 
 		this.process.stdout.on("data", (data) => {
 			this.addToLogs("info", data);
+			console.log(data.toString());
 		});
 
 		this.process.stderr.on("data", (data) => {
 			this.addToLogs("error", data);
+			console.error(data.toString());
 		});
 
 		this.process.on("close", (code, signal) => {
