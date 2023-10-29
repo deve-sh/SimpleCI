@@ -1,3 +1,4 @@
 initial-data.json
 node_modules
 .firebaserc
+firebase-debug.log
