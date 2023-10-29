@@ -28,11 +28,14 @@ class SpawnedProcess {
 	onComplete = new Set();
 
 	/**
-	 * @type { (severity: 'info' | 'error', log: string) => void}
+	 * @type { (severity: 'info' | 'error') => (log: string) => void}
 	 */
-	addToLogs = (severity, log) => {
+	addToLogs = (severity) => (log) => {
 		const logString = log.toString().trim();
 		if (!logString.length) return;
+
+		if (severity === "error") console.error(logString);
+		if (severity === "info") console.log(logString);
 
 		const newLog = {
 			type: severity,
@@ -40,7 +43,7 @@ class SpawnedProcess {
 			ts: new Date().toISOString(),
 		};
 		this.outputLogs.push(newLog);
-        runInfo.logPool.push(newLog);
+		runInfo.addLogToCurrentStep(newLog);
 		this.onLog.forEach((subscriber) => subscriber(newLog));
 	};
 
@@ -52,15 +55,8 @@ class SpawnedProcess {
 	) {
 		this.process = spawn(command, { shell: true });
 
-		this.process.stdout.on("data", (data) => {
-			this.addToLogs("info", data);
-			console.log(data.toString());
-		});
-
-		this.process.stderr.on("data", (data) => {
-			this.addToLogs("error", data);
-			console.error(data.toString());
-		});
+		this.process.stdout.on("data", this.addToLogs("info"));
+		this.process.stderr.on("data", this.addToLogs("error"));
 
 		this.process.on("close", (code, signal) => {
 			if (code || signal) {
@@ -71,7 +67,7 @@ class SpawnedProcess {
 				this.finalStatus = "finished";
 			}
 			this.onComplete.forEach((subscriber) => subscriber(this.finalStatus));
-            runInfo.status = this.finalStatus;
+			runInfo.status = this.finalStatus;
 		});
 	}
 
