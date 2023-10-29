@@ -55,6 +55,8 @@ class RunInfo {
 
 		// @ts-expect-error
 		this.stepsInfo[this.stepsInfo.length - 1].logPool.push(log);
+
+		// TODO: Also send this log to a realtime database or listener for the user to see an append-only log of current job.
 	};
 }
 
