@@ -1,7 +1,7 @@
 // @ts-check
 
 const { spawn } = require("child_process");
-const runInfo = require("../../run-info");
+const runInfo = require("../run-info");
 
 class SpawnedProcess {
 	/**
