@@ -6,24 +6,25 @@ module.exports = () => {
 	 */
 	let initialData;
 	try {
-		// @ts-expect-error This is not present locally, but will be guaranteed present when an instance is spun up
-		initialData = require("./initial-data.json");
+		const fs = require("node:fs");
+		const fileContents = fs.readFileSync("./initial-data.json", "utf-8");
+		initialData = JSON.parse(fileContents);
 	} catch (error) {
-        console.error(error);
-        initialData = null;
+		console.error(error);
+		initialData = null;
 	}
 
 	try {
-        // @ts-expect-error In case we go ahead without an instance approach and embed initial data in an environment variable in stringified form
-		initialData = JSON.parse(process.env.INITIAL_DATA);
+		// @ts-expect-error In case we go ahead without an instance approach and embed initial data in an environment variable in stringified form
+		if (!initialData) initialData = JSON.parse(process.env.INITIAL_DATA);
 	} catch (error) {
-        console.error(error);
+		console.error(error);
 		initialData = null;
 	}
 
 	if (!initialData) return process.exit(-1);
 
-	const requiredFields = ["repositoryURI", "token", "runId", "projectId"];
+	const requiredFields = ["repositoryURI", "runId", "projectId"];
 
 	for (const field of requiredFields) {
 		if (!initialData[field])
