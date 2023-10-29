@@ -26,10 +26,17 @@ const getRepoURLWithToken = (repositoryURI, token) => {
 };
 
 /**
- * @type {(initialData: { repositoryURI: string, token?: string, context: { branchName?: string; } }) => Promise<void>}
+ * @type {(initialData: {
+ * 	runId: string;
+ * 	repositoryURI: string;
+ *  token?: string;
+ * 	context: { branchName?: string;
+ * }
+ *}) => Promise<() => void>}
  */
 const cloneRepo = (initialData) =>
 	new Promise((resolve, reject) => {
+		const ciAppPath = `../${initialData.runId}/ci-cd-app`;
 		const cloningCommand = `git clone ${getRepoURLWithToken(
 			initialData.repositoryURI,
 			initialData.token
@@ -37,11 +44,17 @@ const cloneRepo = (initialData) =>
 			initialData.context?.branchName
 				? "--branch " + initialData.context?.branchName
 				: ""
-		} ../ci-cd-app`;
+		} ${ciAppPath}`;
 		const process = new SpawnedProcess(cloningCommand);
 		process.on("complete", (status) => {
 			if (status === "errored") return reject();
-			return resolve();
+			return resolve(() => {
+				// Cleanup directory
+				const fs = require("node:fs");
+				try {
+					fs.rmdirSync(ciAppPath, { recursive: true });
+				} catch {}
+			});
 		});
 	});
 

@@ -1,43 +1,44 @@
-// @ts-check
+const functions = require("firebase-functions");
 
-const readInitialData = require("./lib/steps/read-initial-data");
-const setupEnvAndContexts = require("./lib/steps/setup-env-and-contexts");
-const cloneRepo = require("./lib/steps/clone-repo");
-const executeStepCommands = require("./lib/steps/execute-step-commands");
-const reportOutcome = require("./lib/steps/report-outcome");
-
-const runInfo = require("./lib/run-info");
-
-const executePipeline = async () => {
-	const initalData = readInitialData();
-
-	runInfo.markNewStep({ stepName: "Setup" });
-	/**
-	 * @type {() => void}
-	 */
-	let removeTemporaryEnvironmentVariables = () => void 0;
-	try {
-		removeTemporaryEnvironmentVariables = await setupEnvAndContexts(initalData);
-		await cloneRepo(initalData);
-		runInfo.markStepEnd();
-	} catch {
-		runInfo.markStepEnd("errored");
-	}
-
-	// Setup done, execute steps and commands
-	// Function takes care of parsing, evaluation and execution of step commands as well adding them to the central run info class.
-	await executeStepCommands(initalData);
-
-	try {
-		runInfo.markNewStep({ stepName: "Teardown and Reporting" });
-		await reportOutcome();
-		
-		removeTemporaryEnvironmentVariables();
-		runInfo.markStepEnd();
-	} catch (error) {
-		console.error(error);
-		//  Internal Failure
-	}
+const runnerSettings = {
+	standard: {
+		timeoutSeconds: 150,
+		memory: "512MB",
+	},
+	medium: {
+		timeoutSeconds: 300,
+		memory: "2GB",
+	},
+	large: {
+		timeoutSeconds: 500,
+		memory: "4GB",
+	},
 };
+exports.pipelineRunnerStandard = functions
+	.runWith(runnerSettings.standard)
+	.firestore.document("ci-job-runs-queue/standard")
+	.onCreate((snap) => {
+		const pipelineRunnerController = require("./api-controllers/pipeline-runner-controller");
+		return pipelineRunnerController(snap);
+	});
 
-executePipeline();
+exports.pipelineRunnerMedium = functions
+	.runWith(runnerSettings.medium)
+	.firestore.document("ci-job-runs-queue/medium")
+	.onCreate((snap) => {
+		const pipelineRunnerController = require("./api-controllers/pipeline-runner-controller");
+		return pipelineRunnerController(snap);
+	});
+
+exports.pipelineRunnerLarge = functions
+	.runWith(runnerSettings.large)
+	.firestore.document("ci-job-runs-queue/large")
+	.onCreate((snap) => {
+		const pipelineRunnerController = require("./api-controllers/pipeline-runner-controller");
+		return pipelineRunnerController(snap);
+	});
+
+// Write the required documents to trigger a pipeline runner from this webhook cloud function.
+exports.gitHubWebhook = functions.https.onRequest((req, res) => {
+	return res.send({});
+});
