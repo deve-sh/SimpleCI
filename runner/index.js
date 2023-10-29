@@ -59,7 +59,7 @@ exports.gitHubWebhook = functions.https.onRequest(async (req, res) => {
 				],
 				projectId: "",
 				env: { ENABLE_DEPLOYS: "true" },
-				context: { event: "push", branchName: "" },
+				context: { event: "push", branchName: "main" },
 			},
 		});
 		batch.set(
