@@ -11,6 +11,7 @@ const runInfo = require("./run-info");
 const executePipeline = async (initialData) => {
 	if (!initialData) initialData = readInitialData();
 
+	let setupIsErrored = false;
 	runInfo.markNewStep({ stepName: "Setup" });
 	/**
 	 * @type {() => void}
@@ -27,12 +28,15 @@ const executePipeline = async (initialData) => {
 		removeClonedFiles = await cloneRepo(initialData);
 		runInfo.markStepEnd();
 	} catch {
+		setupIsErrored = true;
 		runInfo.markStepEnd("errored");
 	}
 
-	// Setup done, execute steps and commands
-	// Function takes care of parsing, evaluation and execution of step commands as well adding them to the central run info class.
-	await executeStepCommands(initialData);
+	if (!setupIsErrored) {
+		// Setup done, execute steps and commands
+		// Function takes care of parsing, evaluation and execution of step commands as well adding them to the central run info class.
+		await executeStepCommands(initialData);
+	}
 
 	try {
 		runInfo.markNewStep({ stepName: "Teardown and Reporting" });

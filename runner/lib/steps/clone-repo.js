@@ -36,7 +36,7 @@ const getRepoURLWithToken = (repositoryURI, token) => {
  */
 const cloneRepo = (initialData) =>
 	new Promise((resolve, reject) => {
-		const ciAppPath = `../${initialData.runId}/ci-cd-app`;
+		const ciAppPath = `/tmp/${initialData.runId}/ci-cd-app`;
 		const cloningCommand = `git clone ${getRepoURLWithToken(
 			initialData.repositoryURI,
 			initialData.token

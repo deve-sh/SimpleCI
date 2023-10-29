@@ -13,7 +13,7 @@ const SpawnedProcess = require("../process/spawn-process");
 const executeIndividualCommand = (command, runId) =>
 	new Promise((resolve, reject) => {
 		// before each command, make sure we're in the directory of the app we want to run ci for.
-		const process = new SpawnedProcess(`cd ../${runId}/ci-cd-app; ${command}`);
+		const process = new SpawnedProcess(`cd /tmp/${runId}/ci-cd-app; ${command}`);
 		process.on("complete", (status) => {
 			if (status === "errored") reject();
 			else resolve();
