@@ -28,7 +28,7 @@ const getRepoURLWithToken = (repositoryURI, token) => {
 /**
  * @type {(initialData: { repositoryURI: string, token?: string, context: { branchName?: string; } }) => Promise<void>}
  */
-module.exports = (initialData) =>
+const cloneRepo = (initialData) =>
 	new Promise((resolve) => {
 		const cloningCommand = `git clone ${getRepoURLWithToken(
 			initialData.repositoryURI,
@@ -41,3 +41,5 @@ module.exports = (initialData) =>
 		const process = new SpawnedProcess(cloningCommand);
 		process.on("complete", resolve);
 	});
+
+module.exports = cloneRepo;

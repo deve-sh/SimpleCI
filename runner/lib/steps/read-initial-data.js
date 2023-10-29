@@ -1,6 +1,6 @@
 // @ts-check
 
-module.exports = () => {
+const readInitialData = () => {
 	/**
 	 * @type { {
 	 * 	repositoryURI: string;
@@ -51,3 +51,5 @@ module.exports = () => {
 
 	return initialData;
 };
+
+module.exports = readInitialData;
