@@ -7,11 +7,13 @@ const SpawnedProcess = require("../process/spawn-process");
 /**
  *
  * @param {string} command
+ * @param {string} runId
  * @returns {Promise<void>}
  */
-const executeIndividualCommand = (command) =>
+const executeIndividualCommand = (command, runId) =>
 	new Promise((resolve, reject) => {
-		const process = new SpawnedProcess(command);
+		// before each command, make sure we're in the directory of the app we want to run ci for.
+		const process = new SpawnedProcess(`cd ../${runId}/ci-cd-app; ${command}`);
 		process.on("complete", (status) => {
 			if (status === "errored") reject();
 			else resolve();
@@ -19,7 +21,7 @@ const executeIndividualCommand = (command) =>
 	});
 
 /**
- * @type {(initialData: { steps: any[] }) => Promise<void>}
+ * @type {(initialData: { runId: string, steps: any[] }) => Promise<void>}
  */
 const executeStepCommands = async (initialData) => {
 	const steps = initialData.steps;
@@ -37,10 +39,10 @@ const executeStepCommands = async (initialData) => {
 			try {
 				if (step.run && Array.isArray(step.run))
 					for (const runCommand of step.run)
-						await executeIndividualCommand(runCommand);
+						await executeIndividualCommand(runCommand, initialData.runId);
 
 				if (typeof step.run === "string")
-					await executeIndividualCommand(step.run);
+					await executeIndividualCommand(step.run, initialData.runId);
 			} catch {
 				// Error thrown in step, terminate execution here and move to unsetting and reporting step
 				runInfo.markStepEnd("errored");
