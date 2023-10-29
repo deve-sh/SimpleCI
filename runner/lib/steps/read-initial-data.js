@@ -2,7 +2,18 @@
 
 module.exports = () => {
 	/**
-	 * @type { {repositoryURI: string; token: string; runId: string; projectId: string } | null }
+	 * @type { {
+	 * 	repositoryURI: string;
+	 * 	token: string;
+	 * 	runId: string;
+	 * 	projectId: string,
+	 *  steps: any[];
+	 *  env: Record<string, string>;
+	 * 	context: {
+	 * 		branchName: string;
+	 * 		event: string;
+	 * 	}
+	 * } | null }
 	 */
 	let initialData;
 	try {
@@ -24,7 +35,14 @@ module.exports = () => {
 
 	if (!initialData) return process.exit(-1);
 
-	const requiredFields = ["repositoryURI", "runId", "projectId"];
+	const requiredFields = [
+		"repositoryURI",
+		"runId",
+		"projectId",
+		"steps",
+		"env",
+		"context",
+	];
 
 	for (const field of requiredFields) {
 		if (!initialData[field])

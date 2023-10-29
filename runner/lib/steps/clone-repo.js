@@ -26,7 +26,7 @@ const getRepoURLWithToken = (repositoryURI, token) => {
 };
 
 /**
- * @type {(initialData: { repositoryURI: string, token?: string, branchName?: string; }) => Promise<void>}
+ * @type {(initialData: { repositoryURI: string, token?: string, context: { branchName?: string; } }) => Promise<void>}
  */
 module.exports = (initialData) =>
 	new Promise((resolve) => {
@@ -34,7 +34,9 @@ module.exports = (initialData) =>
 			initialData.repositoryURI,
 			initialData.token
 		)} --depth=1 ${
-			initialData.branchName ? "--branch " + initialData.branchName : ""
+			initialData.context?.branchName
+				? "--branch " + initialData.context?.branchName
+				: ""
 		} ../ci-cd-app`;
 		const process = new SpawnedProcess(cloningCommand);
 		process.on("complete", resolve);
