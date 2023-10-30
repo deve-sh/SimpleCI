@@ -100,6 +100,10 @@ class AuthProvider {
 		return gitHubAuthProvider;
 	}
 
+	get currentUser() {
+		return this.internalAuthProvider.currentUser || authStore.getState().user;
+	}
+
 	getUserToken = async ({ getFromCache = true } = {}) => {
 		if (getFromCache && sessionStorage.getItem("access_token"))
 			return sessionStorage.getItem("access_token");

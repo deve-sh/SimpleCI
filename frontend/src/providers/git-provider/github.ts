@@ -1,6 +1,8 @@
 import { Octokit } from "octokit";
 
 import type GitProviderMethods from "./interface";
+import { useEffect } from "react";
+import { useAuth } from "../auth";
 
 class GitHub implements GitProviderMethods {
 	private apiToken: string | null = null;
@@ -31,4 +33,16 @@ class GitHub implements GitProviderMethods {
 	};
 }
 
-export default new GitHub();
+const githubProvider = new GitHub();
+
+export default githubProvider;
+
+// Hooks for consumption in React Tree
+export const useSetGitHubCredentials = () => {
+	const { oauthCredentials } = useAuth();
+
+	useEffect(() => {
+		if (oauthCredentials && oauthCredentials.providerId === "github.com")
+			githubProvider.initialize(oauthCredentials?.accessToken as string);
+	}, [oauthCredentials]);
+};
