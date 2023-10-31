@@ -68,7 +68,11 @@ const UserDashboard = () => {
 				cloneURL: selectedRepo.clone_url,
 				url: selectedRepo.html_url,
 				repositoryId: selectedRepo.id,
+				repositoryName: selectedRepo.name,
 				organization: null,
+				providerSpecificContext: {
+					owner: selectedRepo.owner.login,
+				},
 			};
 			const { error } = await createProject(projectPayload);
 

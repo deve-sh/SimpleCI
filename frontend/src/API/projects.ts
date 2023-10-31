@@ -20,6 +20,7 @@ const COLLECTION_NAME = "simpleci-projects";
 export interface Project {
 	name: string;
 	repositoryId: string | number;
+	repositoryName: string;
 	cloneURL: string;
 	url: string;
 	gitProvider: "github";
@@ -31,6 +32,7 @@ export interface Project {
 	updatedBy: string;
 	createdAt: Timestamp;
 	updatedAt: Timestamp;
+	providerSpecificContext?: Record<string, string>,
 	config: {
 		hookEvents: string[];
 		runnerPreference: "standard" | "medium" | "large";
