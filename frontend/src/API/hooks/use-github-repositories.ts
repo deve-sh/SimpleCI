@@ -1,9 +1,12 @@
+import { useAuth } from "../../providers/auth";
 import githubProvider from "../../providers/git-provider/github";
 import useFetch from "./use-fetch";
 
 const useGitHubRepositories = () => {
+	const { user } = useAuth();
+	
 	return useFetch<ReturnType<(typeof githubProvider)["getRepositories"]>>(
-		"github-repositores",
+		user && user.providerId === "github.com" ? "github-repositores" : null,
 		githubProvider.getRepositories
 	);
 };
