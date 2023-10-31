@@ -23,7 +23,7 @@ export interface Project {
 	repositoryName: string;
 	cloneURL: string;
 	url: string;
-	gitProvider: "github";
+	repoProvider: "github";
 	token: string;
 	ownedBy: string;
 	members: string[];

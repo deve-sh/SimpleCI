@@ -63,7 +63,7 @@ const UserDashboard = () => {
 					hookEvents: inputs.hookEvents,
 					runnerPreference: inputs.runnerPreference,
 				},
-				gitProvider: "github",
+				repoProvider: "github",
 				token: oauthCredentials?.accessToken as string,
 				cloneURL: selectedRepo.clone_url,
 				url: selectedRepo.html_url,

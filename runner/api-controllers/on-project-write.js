@@ -23,11 +23,11 @@ const onProjectWrite = async (
 		const token = projectData.token;
 		const owner = projectData.providerSpecificContext.owner;
 
+		if (provider !== "github" || !token) return;
+
 		const admin = require("../firebase/admin");
 
 		if (!change.after.exists) {
-			if (provider !== "github" || !token) return;
-
 			// Delete registered webhooks
 			const webhookIdsRegisteredForProject = (
 				await admin
@@ -47,8 +47,6 @@ const onProjectWrite = async (
 			return;
 		}
 		if (!change.before.exists) {
-			if (provider !== "github" || !token) return;
-
 			// Register webhook
 			const { default: axios } = require("axios");
 			const generateCloudFunctionURL = require("../firebase/generate-cloud-function-url");
@@ -57,7 +55,7 @@ const onProjectWrite = async (
 			const { data } = await axios.post(
 				`https://api.github.com/repos/${owner}/${repoName}/hooks`,
 				{
-					name: "SimpleCI CI/CD Project Webhook",
+					name: "web",
 					active: true,
 					events: hookEvents,
 					config: {
