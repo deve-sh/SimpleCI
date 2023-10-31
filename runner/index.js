@@ -11,7 +11,7 @@ const runnerSettings = {
 		memory: "2GB",
 	},
 	large: {
-		timeoutSeconds: 500,
+		timeoutSeconds: 540,
 		memory: "4GB",
 	},
 };
