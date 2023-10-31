@@ -53,6 +53,7 @@ export const createProject = async (project: Partial<Project>) => {
 			projectDoc,
 			{
 				...project,
+				id: projectId,
 				createdAt: serverTimestamp(),
 				updatedAt: serverTimestamp(),
 				createdBy: auth.currentUser.uid,

@@ -45,6 +45,14 @@ exports.pipelineRunnerLarge = functions
 		return pipelineRunnerController(runnerSettings.large)(change.after);
 	});
 
+exports.onSimpleCIProjectWrite = functions
+	.region("asia-south1")
+	.firestore.document("simpleci-projects/{projectId}")
+	.onWrite((change, context) => {
+		const onProjectWrite = require("./api-controllers/on-project-write");
+		return onProjectWrite(change, context);
+	});
+
 // Write the required documents to trigger a pipeline runner from this webhook cloud function.
 exports.gitHubWebhook = functions
 	.region("asia-south1")
