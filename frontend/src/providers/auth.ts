@@ -25,6 +25,7 @@ type UserInState = {
 	emailVerified: boolean;
 	phoneNumber: string | null;
 	photoURL: string | null;
+	providerId: string;
 };
 
 interface AuthStoreState {
@@ -90,6 +91,7 @@ class AuthProvider {
 				photoURL: user.photoURL,
 				emailVerified: user.emailVerified,
 				phoneNumber: user.phoneNumber,
+				providerId: user.providerData[0].providerId,
 			});
 		});
 	}
@@ -119,6 +121,7 @@ class AuthProvider {
 			const provider = mode === "github" ? this.gitHubProvider : null;
 			if (!provider) throw new Error("Invalid sign in mode");
 
+			authStore.getState().setSigningIn(true);
 			const signInResult = await signInWithPopup(
 				this.internalAuthProvider,
 				provider
@@ -135,8 +138,10 @@ class AuthProvider {
 						oauthSupportedProvider.credentialFromResult(signInResult)
 					);
 			}
+			authStore.getState().setSigningIn(false);
 			return { data: signInResult, error: null };
 		} catch (error) {
+			authStore.getState().setSigningIn(false);
 			return { data: null, error };
 		}
 	};
