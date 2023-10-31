@@ -2,28 +2,37 @@
 
 const runIdIdempotencyMap = new Set();
 
-const pipelineRunnerController = async (
-	/**
-	 * @type {import("firebase-functions/v1/firestore").QueryDocumentSnapshot}
-	 */
-	snap
-) => {
-	const runId = snap.data().runId;
+const pipelineRunnerController =
+	(
+		/**
+		 * @type { { timeoutSeconds: number } }
+		 */
+		config
+	) =>
+	async (
+		/**
+		 * @type {import("firebase-functions/v1/firestore").QueryDocumentSnapshot}
+		 */
+		snap
+	) => {
+		// TODO: Setup listeners and process killers 2 seconds before config.timeoutSeconds
 
-	if (runIdIdempotencyMap.has(runId)) return;
-	runIdIdempotencyMap.add(runId);
+		const runId = snap.data().runId;
 
-	const admin = require("../firebase/admin");
+		if (runIdIdempotencyMap.has(runId)) return;
+		runIdIdempotencyMap.add(runId);
 
-	const runDocumentData = (
-		await admin.firestore().collection("runs").doc(runId).get()
-	).data();
-	if (!runDocumentData) return;
+		const admin = require("../firebase/admin");
 
-	const initialData = runDocumentData.initialData;
+		const runDocumentData = (
+			await admin.firestore().collection("runs").doc(runId).get()
+		).data();
+		if (!runDocumentData) return;
 
-	const executePipeline = require("../lib/pipeline-executor");
-	return executePipeline(initialData);
-};
+		const initialData = runDocumentData.initialData;
+
+		const executePipeline = require("../lib/pipeline-executor");
+		return executePipeline(initialData);
+	};
 
 module.exports = pipelineRunnerController;

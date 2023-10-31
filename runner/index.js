@@ -22,7 +22,7 @@ exports.pipelineRunnerStandard = functions
 	.onWrite((change) => {
 		if (!change.after.exists) return;
 		const pipelineRunnerController = require("./api-controllers/pipeline-runner-controller");
-		return pipelineRunnerController(change.after);
+		return pipelineRunnerController(runnerSettings.standard)(change.after);
 	});
 
 exports.pipelineRunnerMedium = functions
@@ -32,7 +32,7 @@ exports.pipelineRunnerMedium = functions
 	.onWrite((change) => {
 		if (!change.after.exists) return;
 		const pipelineRunnerController = require("./api-controllers/pipeline-runner-controller");
-		return pipelineRunnerController(change.after);
+		return pipelineRunnerController(runnerSettings.medium)(change.after);
 	});
 
 exports.pipelineRunnerLarge = functions
@@ -42,7 +42,7 @@ exports.pipelineRunnerLarge = functions
 	.onWrite((change) => {
 		if (!change.after.exists) return;
 		const pipelineRunnerController = require("./api-controllers/pipeline-runner-controller");
-		return pipelineRunnerController(change.after);
+		return pipelineRunnerController(runnerSettings.large)(change.after);
 	});
 
 // Write the required documents to trigger a pipeline runner from this webhook cloud function.
