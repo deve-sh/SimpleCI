@@ -67,11 +67,13 @@ const gitHubWebhook = async (
 		/**
 		 * @type { Record<string, string> }
 		 */
-		let ciFileContents;
+		let ciFileContents = {};
 		try {
+			const params = {};
+			if (req.body.base_ref) params["ref"] = req.body.base_ref;
 			const ciFileResponse = await axios.get(
 				`https://api.github.com/repos/${projectData.providerSpecificContext.owner}/${projectData.repositoryName}/contents/.simpleci/pipeline.json`,
-				{ headers: { Accept: "application/vnd.github.v3.raw" } }
+				{ headers: { Accept: "application/vnd.github.v3.raw" }, params }
 			);
 			ciFileContents = JSON.parse(ciFileResponse.data);
 		} catch {
@@ -97,7 +99,11 @@ const gitHubWebhook = async (
 				env: {},
 				// TODO: Need to refine what we pick from req.body based on the events and payload GitHub sends us.
 				// For now the user can use whatever they get from payload as defined in https://docs.github.com/en/webhooks/webhook-events-and-payload
-				context: { event: getFromRequestHeader("X-GitHub-Event"), ...req.body },
+				context: {
+					event: getFromRequestHeader("X-GitHub-Event"),
+					branchName: req.body.base_ref || "",
+					...req.body,
+				},
 			},
 		});
 
