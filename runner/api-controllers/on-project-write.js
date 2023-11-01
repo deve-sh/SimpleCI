@@ -26,12 +26,12 @@ const onProjectWrite = async (
 		if (provider !== "github" || !token) return;
 
 		const admin = require("../firebase/admin");
+		const db = admin.firestore();
 
 		if (!change.after.exists) {
 			// Delete registered webhooks
 			const webhookIdsRegisteredForProject = (
-				await admin
-					.firestore()
+				await db
 					.collection("simpleci-registered-webhooks")
 					.where("project", "==", projectId)
 					.get()
@@ -68,24 +68,22 @@ const onProjectWrite = async (
 				{ headers: { Authorization: `Bearer ${token}` } }
 			);
 
-			if (data.id)
-				await admin
-					.firestore()
-					.collection("simpleci-registered-webhooks")
-					.doc(data.id)
-					.set({
-						webhookData: {
-							url: data.url,
-							test_url: data.test_url,
-							ping_url: data.ping_url,
-							deliveries_url: data.deliveries_url,
-						},
-						id: data.id,
-						project: projectId,
-						createdAt: new Date(),
-						updatedAt: new Date(),
-					});
-			return;
+			console.log("Webhook created: ", data);
+			const webhookId = data.id;
+			return await db
+				.collection("simpleci-registered-webhooks")
+				.doc(webhookId)
+				.set({
+					webhookData: {
+						url: data.url,
+						testUrl: data.test_url,
+						pingUrl: data.ping_url,
+						deliveriesUrl: data.deliveries_url,
+					},
+					id: data.id,
+					project: projectId,
+					createdAt: new Date(),
+				});
 		}
 
 		// Update webhooks
@@ -95,8 +93,7 @@ const onProjectWrite = async (
 		if (!hookEventsHaveChanged) return;
 
 		const webhookIdsRegisteredForProject = (
-			await admin
-				.firestore()
+			await db
 				.collection("simpleci-registered-webhooks")
 				.where("project", "==", projectId)
 				.get()
