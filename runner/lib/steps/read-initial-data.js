@@ -6,7 +6,7 @@ const readInitialData = () => {
 	 * 	repositoryURI: string;
 	 * 	token: string;
 	 * 	runId: string;
-	 * 	projectId: string,
+	 * 	project: string,
 	 *  steps: any[];
 	 *  env: Record<string, string>;
 	 * 	context: {
@@ -38,7 +38,7 @@ const readInitialData = () => {
 	const requiredFields = [
 		"repositoryURI",
 		"runId",
-		"projectId",
+		"project",
 		"steps",
 		"env",
 		"context",

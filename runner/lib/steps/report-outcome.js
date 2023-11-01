@@ -7,8 +7,6 @@ const reportOutcome = async () => {
 
 	const runInfo = require("../run-info");
 
-	console.log(runInfo);
-
 	const anyStepErrored = runInfo.stepsOutcome.some(
 		(step) => step.status === "errored"
 	);

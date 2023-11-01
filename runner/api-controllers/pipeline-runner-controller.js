@@ -29,10 +29,10 @@ const pipelineRunnerController =
 		).data();
 		if (!runDocumentData) return;
 
-		const initialData = runDocumentData.initialData;
+		const contextData = runDocumentData.contextData;
 
 		const executePipeline = require("../lib/pipeline-executor");
-		return executePipeline(initialData, config.timeoutSeconds);
+		return executePipeline(contextData, config.timeoutSeconds);
 	};
 
 module.exports = pipelineRunnerController;
