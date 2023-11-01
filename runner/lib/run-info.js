@@ -14,14 +14,18 @@ class RunInfo {
 	 * 	from: string;
 	 * 	to: string;
 	 * 	status: typeof this.status;
-	 * 	logPool: {
-	 * 		type: 'error' | 'info',
-	 * 		log: string,
-	 * 		ts: string;
-	 * 	}[]
 	 * }[]}
 	 */
 	stepsOutcome = [];
+	/**
+	 * @type {{
+	 * 	type: 'error' | 'info';
+	 * 	log: string;
+	 * 	ts: string;
+	 * 	stepId: string;
+	 * }[]}
+	 */
+	logPool = [];
 	/**
 	 * @type {Record<string, string>}
 	 */
@@ -43,7 +47,6 @@ class RunInfo {
 			stepName: step.stepName || "",
 			id: uuidv4(),
 			from: new Date().toISOString(),
-			logPool: [],
 			to: "",
 			status: "in-progress",
 		});
@@ -64,15 +67,14 @@ class RunInfo {
 
 	addLogToCurrentStep = (
 		/**
-		 * @type { Partial<typeof this.stepsOutcome[number]['logPool'][number]> }
+		 * @type { Omit<typeof this.logPool[number], 'stepId'> }
 		 */
 		log
 	) => {
 		const currentStep = this.stepsOutcome[this.stepsOutcome.length - 1];
 		if (!currentStep) return;
 
-		// @ts-expect-error
-		this.stepsOutcome[this.stepsOutcome.length - 1].logPool.push(log);
+		this.logPool.push({ stepId: currentStep.id, ...log });
 
 		// TODO: Also send this log to a realtime database or listener for the user to see an append-only log of current job.
 	};
