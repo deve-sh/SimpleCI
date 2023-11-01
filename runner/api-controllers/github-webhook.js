@@ -100,7 +100,7 @@ const gitHubWebhook = async (
 				// TODO: Need to refine what we pick from req.body based on the events and payload GitHub sends us.
 				// For now the user can use whatever they get from payload as defined in https://docs.github.com/en/webhooks/webhook-events-and-payload
 				context: {
-					event: getFromRequestHeader("X-GitHub-Event"),
+					event: getFromRequestHeader("X-GitHub-Event") || req.body.action,
 					branchName: req.body.base_ref || "",
 					...req.body,
 				},
