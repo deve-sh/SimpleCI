@@ -88,7 +88,8 @@ const onProjectWrite = async (
 		// Update webhooks
 		const dataBefore = change.before.data() || {};
 		const hookEventsHaveChanged =
-			dataBefore.hookEvents?.length !== projectData.hookEvents.length;
+			dataBefore.config?.hookEvents?.length !==
+			projectData.config?.hookEvents?.length;
 		if (!hookEventsHaveChanged) return;
 
 		const webhookIdsRegisteredForProject = (
