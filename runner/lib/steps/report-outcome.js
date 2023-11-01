@@ -12,7 +12,11 @@ const reportOutcome = async (
 	// and logs to a file on storage
 	// or everything to a database/storage
 
-	console.log(runInfo.stepsOutcome);
+	console.log(runInfo);
+
+	const anyStepErrored = runInfo.stepsOutcome.some(
+		(step) => step.status === "errored"
+	);
 
 	const admin = require("../../firebase/admin");
 	await admin
@@ -20,7 +24,10 @@ const reportOutcome = async (
 		.collection("runs")
 		.doc(runId)
 		.set(
-			{ status: runInfo.status, stepsExecuted: runInfo.stepsOutcome },
+			{
+				status: anyStepErrored ? "errored" : "finished",
+				stepsExecuted: runInfo.stepsOutcome,
+			},
 			{ merge: true }
 		);
 

@@ -4,10 +4,6 @@ const { uuidv4 } = require("@firebase/util");
 
 class RunInfo {
 	/**
-	 * @type { 'errored' | 'in-progress' | 'finished' }
-	 */
-	status = "in-progress";
-	/**
 	 * @type {{
 	 * 	stepName:string;
 	 * 	id: string;
@@ -38,7 +34,8 @@ class RunInfo {
 	constructor() {}
 
 	inProgress = () => {
-		return this.status === "in-progress";
+		const currentStep = this.stepsOutcome[this.stepsOutcome.length - 1];
+		return !currentStep || currentStep.status !== "errored";
 	};
 
 	markNewStep = (
@@ -65,16 +62,17 @@ class RunInfo {
 	/**
 	 * @type {(status?:'errored' | 'finished', options?: { force?: boolean }) => void}
 	 */
-	markStepEnd = (status, { force = false } = {}) => {
+	markStepEnd = (status = "finished", { force = false } = {}) => {
 		if (!this.inProgress() && !force) return;
 
 		const currentStep = this.stepsOutcome[this.stepsOutcome.length - 1];
 		if (!currentStep) return;
 
-		this.stepsOutcome[this.stepsOutcome.length - 1].status =
-			status || "finished";
-		this.stepsOutcome[this.stepsOutcome.length - 1].to =
-			new Date().toISOString();
+		this.stepsOutcome[this.stepsOutcome.length - 1] = {
+			...currentStep,
+			status,
+			to: new Date().toISOString(),
+		};
 	};
 
 	addLogToCurrentStep = (

@@ -14,8 +14,8 @@ const MINIMUM_TIMEOUT_SECONDS = 100;
 const executePipeline = async (initialData, timeoutSeconds) => {
 	let alreadyReportedAndTornDown = false;
 
-	const timeout = setTimeout(() => {
-		if (alreadyReportedAndTornDown) return clearTimeout(timeout);
+	let timeout = setTimeout(() => {
+		if (alreadyReportedAndTornDown) return (timeout = clearTimeout(timeout));
 
 		if (
 			runInfo.stepsOutcome[runInfo.stepsOutcome.length - 1].status ===
@@ -28,18 +28,26 @@ const executePipeline = async (initialData, timeoutSeconds) => {
 				ts: new Date().toISOString(),
 			});
 			runInfo.markStepEnd("errored");
-			runInfo.status = "errored";
 		}
 
 		teardownAndReport({ fromTimeout: true });
 	}, Math.max(MINIMUM_TIMEOUT_SECONDS, timeoutSeconds - 4.5) * 1000);
+
+	/**
+	 * @type {() => void}
+	 */
+	let removeTemporaryEnvironmentVariables = () => void 0;
+	/**
+	 * @type {() => void}
+	 */
+	let removeClonedFiles = () => void 0;
 
 	const teardownAndReport = async ({ fromTimeout = false } = {}) => {
 		try {
 			if (alreadyReportedAndTornDown) return;
 			alreadyReportedAndTornDown = true;
 
-			if (timeout) clearInterval(timeout);
+			if (timeout) timeout = clearInterval(timeout);
 
 			runInfo.markNewStep(
 				{ stepName: "Teardown and Reporting" },
@@ -50,8 +58,6 @@ const executePipeline = async (initialData, timeoutSeconds) => {
 			removeTemporaryEnvironmentVariables();
 
 			runInfo.markStepEnd("finished", { force: true });
-			if (!fromTimeout) runInfo.status = "finished";
-
 			await reportOutcome();
 		} catch (error) {
 			console.error(error);
@@ -63,23 +69,16 @@ const executePipeline = async (initialData, timeoutSeconds) => {
 
 	let setupIsErrored = false;
 	runInfo.markNewStep({ stepName: "Setup" });
-	/**
-	 * @type {() => void}
-	 */
-	let removeTemporaryEnvironmentVariables = () => void 0;
-	/**
-	 * @type {() => void}
-	 */
-	let removeClonedFiles = () => void 0;
+
 	try {
 		removeTemporaryEnvironmentVariables = await setupEnvAndContexts(
 			initialData
 		);
 		removeClonedFiles = await cloneRepo(initialData);
 		runInfo.markStepEnd();
-	} catch {
-		setupIsErrored = true;
+	} catch (error) {
 		runInfo.markStepEnd("errored");
+		setupIsErrored = true;
 	}
 
 	if (!setupIsErrored) {

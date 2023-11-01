@@ -46,7 +46,6 @@ const executeStepCommands = async (initialData) => {
 			} catch {
 				// Error thrown in step, terminate execution here and move to unsetting and reporting step
 				runInfo.markStepEnd("errored");
-				runInfo.status = "errored";
 				return;
 			}
 

@@ -67,7 +67,6 @@ class SpawnedProcess {
 				this.finalStatus = "finished";
 			}
 			this.onComplete.forEach((subscriber) => subscriber(this.finalStatus));
-			runInfo.status = this.finalStatus;
 		});
 	}
 
