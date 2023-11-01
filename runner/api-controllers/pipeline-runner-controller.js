@@ -32,7 +32,7 @@ const pipelineRunnerController =
 		const initialData = runDocumentData.initialData;
 
 		const executePipeline = require("../lib/pipeline-executor");
-		return executePipeline(initialData);
+		return executePipeline(initialData, config.timeoutSeconds);
 	};
 
 module.exports = pipelineRunnerController;

@@ -37,12 +37,22 @@ class RunInfo {
 
 	constructor() {}
 
+	inProgress = () => {
+		return this.status === "in-progress";
+	};
+
 	markNewStep = (
 		/**
 		 * @type { Partial<typeof this.stepsOutcome[number]> }
 		 */
-		step
+		step,
+		/**
+		 * @type { { force?: boolean } }
+		 */
+		{ force = false } = {}
 	) => {
+		if (!this.inProgress() && !force) return;
+
 		this.stepsOutcome.push({
 			stepName: step.stepName || "",
 			id: uuidv4(),
@@ -53,9 +63,11 @@ class RunInfo {
 	};
 
 	/**
-	 * @type {(status?:'errored' | 'finished') => void}
+	 * @type {(status?:'errored' | 'finished', options?: { force?: boolean }) => void}
 	 */
-	markStepEnd = (status) => {
+	markStepEnd = (status, { force = false } = {}) => {
+		if (!this.inProgress() && !force) return;
+
 		const currentStep = this.stepsOutcome[this.stepsOutcome.length - 1];
 		if (!currentStep) return;
 
@@ -71,6 +83,8 @@ class RunInfo {
 		 */
 		log
 	) => {
+		if (!this.inProgress()) return;
+
 		const currentStep = this.stepsOutcome[this.stepsOutcome.length - 1];
 		if (!currentStep) return;
 

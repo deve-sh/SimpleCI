@@ -14,20 +14,17 @@ const reportOutcome = async (
 
 	console.log(runInfo.stepsOutcome);
 
-	// For now just storing the information in a Database
-	// Do remember that logfiles are supposed to be the ideal place for storing this information.
-	// Databases have limits on the size of their entries as well as cost more per bit stored and bandwidth consumed.
-
 	const admin = require("../../firebase/admin");
-	// Don't forget to disable indexing on the logsAndMetadata field as it can get a little heavy.
 	await admin
 		.firestore()
 		.collection("runs")
 		.doc(runId)
 		.set(
-			{ status: runInfo.status, logsAndMetadata: runInfo.stepsOutcome },
+			{ status: runInfo.status, stepsExecuted: runInfo.stepsOutcome },
 			{ merge: true }
 		);
+
+	// Upload log pool to a file.
 };
 
 module.exports = reportOutcome;
