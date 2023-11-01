@@ -15,6 +15,8 @@ const executePipeline = async (initialData, timeoutSeconds) => {
 	let alreadyReportedAndTornDown = false;
 
 	const timeout = setTimeout(() => {
+		if (alreadyReportedAndTornDown) return clearTimeout(timeout);
+
 		if (
 			runInfo.stepsOutcome[runInfo.stepsOutcome.length - 1].status ===
 			"in-progress"
@@ -26,10 +28,10 @@ const executePipeline = async (initialData, timeoutSeconds) => {
 				ts: new Date().toISOString(),
 			});
 			runInfo.markStepEnd("errored");
-
 			runInfo.status = "errored";
-			teardownAndReport({ fromTimeout: true });
 		}
+
+		teardownAndReport({ fromTimeout: true });
 	}, Math.max(MINIMUM_TIMEOUT_SECONDS, timeoutSeconds - 4.5) * 1000);
 
 	const teardownAndReport = async ({ fromTimeout = false } = {}) => {
