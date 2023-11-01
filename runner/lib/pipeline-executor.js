@@ -12,8 +12,10 @@ const runInfo = require("./run-info");
 const MINIMUM_TIMEOUT_SECONDS = 100;
 
 const executePipeline = async (initialData, timeoutSeconds) => {
-	let alreadyReportedAndTornDown = false;
+	runInfo.runId = initialData.runId;
 
+	// Teardown and timeout handling
+	let alreadyReportedAndTornDown = false;
 	let timeout = setTimeout(() => {
 		if (alreadyReportedAndTornDown) return (timeout = clearTimeout(timeout));
 
@@ -67,10 +69,10 @@ const executePipeline = async (initialData, timeoutSeconds) => {
 
 	if (!initialData) initialData = readInitialData();
 
+	//#region Actual execution
 	let setupIsErrored = false;
-	runInfo.markNewStep({ stepName: "Setup" });
-
 	try {
+		runInfo.markNewStep({ stepName: "Setup" });
 		removeTemporaryEnvironmentVariables = await setupEnvAndContexts(
 			initialData
 		);
@@ -88,6 +90,7 @@ const executePipeline = async (initialData, timeoutSeconds) => {
 	}
 
 	await teardownAndReport();
+	//#endregion
 };
 
 module.exports = executePipeline;

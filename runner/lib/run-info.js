@@ -1,8 +1,11 @@
 // @ts-check
 
-const { uuidv4 } = require("@firebase/util");
-
 class RunInfo {
+	/**
+	 * @type { string }
+	 */
+	runId;
+
 	/**
 	 * @type {{
 	 * 	stepName:string;
@@ -50,6 +53,7 @@ class RunInfo {
 	) => {
 		if (!this.inProgress() && !force) return;
 
+		const { uuidv4 } = require("@firebase/util");
 		this.stepsOutcome.push({
 			stepName: step.stepName || "",
 			id: uuidv4(),
@@ -86,9 +90,12 @@ class RunInfo {
 		const currentStep = this.stepsOutcome[this.stepsOutcome.length - 1];
 		if (!currentStep) return;
 
-		this.logPool.push({ stepId: currentStep.id, ...log });
+		const logEntry = { stepId: currentStep.id, ...log };
+		this.logPool.push(logEntry);
 
-		// TODO: Also send this log to a realtime database or listener for the user to see an append-only log of current job.
+		// Add to a database or append to a log file.
+		const appendLog = require("./reporters/append-log");
+		appendLog(logEntry);
 	};
 }
 

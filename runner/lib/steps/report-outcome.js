@@ -1,22 +1,18 @@
 // @ts-check
 
-const runInfo = require("../run-info");
-
-const reportOutcome = async (
-	/**
-	 * @type { string }
-	 */
-	runId
-) => {
+const reportOutcome = async () => {
 	// Use runInfo and store the output to a database
 	// and logs to a file on storage
 	// or everything to a database/storage
+
+	const runInfo = require("../run-info");
 
 	console.log(runInfo);
 
 	const anyStepErrored = runInfo.stepsOutcome.some(
 		(step) => step.status === "errored"
 	);
+	const runId = runInfo.runId;
 
 	const admin = require("../../firebase/admin");
 	await admin
@@ -30,8 +26,6 @@ const reportOutcome = async (
 			},
 			{ merge: true }
 		);
-
-	// Upload log pool to a file.
 };
 
 module.exports = reportOutcome;
