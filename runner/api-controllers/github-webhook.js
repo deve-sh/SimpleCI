@@ -85,7 +85,7 @@ const gitHubWebhook = async (
 			associatedWebhook: webhookId,
 			status: "in-progress",
 			// The initial data to use for the runner
-			contextData: {
+			initialData: {
 				runId,
 				repositoryURI: projectData.cloneURL,
 				token: projectData.token,
