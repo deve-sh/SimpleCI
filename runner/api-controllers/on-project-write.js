@@ -68,8 +68,7 @@ const onProjectWrite = async (
 				{ headers: { Authorization: `Bearer ${token}` } }
 			);
 
-			console.log("Webhook created: ", data);
-			const webhookId = data.id;
+			const webhookId = data.id.toString();
 			return await db
 				.collection("simpleci-registered-webhooks")
 				.doc(webhookId)
