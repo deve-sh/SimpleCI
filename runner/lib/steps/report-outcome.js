@@ -21,6 +21,7 @@ const reportOutcome = async () => {
 			{
 				status: anyStepErrored ? "errored" : "finished",
 				stepsExecuted: runInfo.stepsOutcome,
+				updatedAt: new Date(),
 			},
 			{ merge: true }
 		);

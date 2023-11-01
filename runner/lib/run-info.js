@@ -61,6 +61,9 @@ class RunInfo {
 			to: "",
 			status: "in-progress",
 		});
+
+		const reportSteps = require("./reporters/report-steps");
+		reportSteps();
 	};
 
 	/**
@@ -77,6 +80,9 @@ class RunInfo {
 			status,
 			to: new Date().toISOString(),
 		};
+
+		const reportSteps = require("./reporters/report-steps");
+		reportSteps();
 	};
 
 	addLogToCurrentStep = (
