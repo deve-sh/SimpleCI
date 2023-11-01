@@ -4,7 +4,7 @@
 	"description": "",
 	"main": "index.js",
 	"scripts": {
-		"serve": "firebase emulators:start --only functions",
+		"serve": "firebase emulators:start --only functions,firestore,auth",
 		"deploy": "firebase deploy --only functions",
 		"deploy-database-rules": "firebase deploy --only firestore:rules"
 	},
