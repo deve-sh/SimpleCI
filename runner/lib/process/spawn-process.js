@@ -1,8 +1,5 @@
 // @ts-check
 
-const { spawn } = require("child_process");
-const runInfo = require("../run-info");
-
 class SpawnedProcess {
 	/**
 	 * @type { import("child_process").ChildProcessWithoutNullStreams | null }
@@ -37,14 +34,30 @@ class SpawnedProcess {
 		if (severity === "error") console.error(logString);
 		if (severity === "info") console.log(logString);
 
+		const runInfo = require("../run-info");
+
+		// Hide sensitive information like environment variable values
+		let processedLogString = logString;
+		for (const envVar in runInfo.env) {
+			if (runInfo.env.hasOwnProperty(envVar)) {
+				const envVarValue = runInfo.env[processedLogString];
+				processedLogString = processedLogString.replace(
+					logString[envVarValue],
+					"*".repeat(Math.min(envVarValue.length, 6))
+				);
+			}
+		}
+		
 		const newLog = {
 			type: severity,
-			log: logString,
+			log: processedLogString,
 			ts: new Date().toISOString(),
 		};
+
 		this.outputLogs.push(newLog);
-		runInfo.addLogToCurrentStep(newLog);
 		this.onLog.forEach((subscriber) => subscriber(newLog));
+
+		runInfo.addLogToCurrentStep(newLog);
 	};
 
 	constructor(
@@ -53,6 +66,8 @@ class SpawnedProcess {
 		 */
 		command
 	) {
+		const { spawn } = require("child_process");
+
 		this.process = spawn(command, { shell: true });
 
 		this.process.stdout.on("data", this.addToLogs("info"));
