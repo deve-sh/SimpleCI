@@ -9,6 +9,8 @@ import {
 	orderBy,
 	limit,
 	type Timestamp,
+	type DocumentData,
+	type QuerySnapshot,
 } from "firebase/firestore";
 import { v4 as uuid } from "uuid";
 
@@ -32,7 +34,7 @@ export interface Project {
 	updatedBy: string;
 	createdAt: Timestamp;
 	updatedAt: Timestamp;
-	providerSpecificContext?: Record<string, string>,
+	providerSpecificContext?: Record<string, string>;
 	config: {
 		hookEvents: string[];
 		runnerPreference: "standard" | "medium" | "large";
@@ -72,25 +74,21 @@ export const createProject = async (project: Partial<Project>) => {
 	}
 };
 
-export const getUserProjects = async () => {
-	try {
-		if (!auth.currentUser) throw new Error("User isn't logged in.");
-
-		const projectsQuery = query(
-			collection(db, COLLECTION_NAME),
-			where("members", "array-contains", auth.currentUser?.uid as string),
-			orderBy("createdAt", "desc")
-		);
-		const projects = (await getDocs(projectsQuery)).docs.map((project) => ({
-			...project,
-			createdAt: project.get("createdAt").toDate(),
-			updatedAt: project.get("updatedAt").toDate(),
-		}));
-
-		return { error: null, data: projects };
-	} catch (error) {
-		return { error, data: [] };
-	}
+export const getUserProjectsQuery = () => {
+	const projectsQuery = query(
+		collection(db, COLLECTION_NAME),
+		where("members", "array-contains", auth.currentUser?.uid as string),
+		orderBy("createdAt", "desc")
+	);
+	return {
+		query: projectsQuery,
+		processData: (snapshot: QuerySnapshot<DocumentData, DocumentData>) =>
+			snapshot.docs.map((project) => ({
+				...(project.data() as Project),
+				createdAt: project.get("createdAt").toDate(),
+				updatedAt: project.get("updatedAt").toDate(),
+			})),
+	};
 };
 
 export const getUserProjectByRepoId = async (repoId: string | number) => {
@@ -102,7 +100,7 @@ export const getUserProjectByRepoId = async (repoId: string | number) => {
 			limit(1)
 		);
 		const projects = (await getDocs(projectQuery)).docs.map((project) => ({
-			...project,
+			...(project.data() as Project),
 			createdAt: project.get("createdAt").toDate(),
 			updatedAt: project.get("updatedAt").toDate(),
 		}));
