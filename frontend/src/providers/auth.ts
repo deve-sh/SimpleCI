@@ -29,7 +29,7 @@ type UserInState = {
 };
 
 interface AuthStoreState {
-	user: Record<string, UserInState[keyof UserInState]> | null;
+	user: UserInState | null;
 	setUser: (user: AuthStoreState["user"] | null) => void;
 	ready: boolean;
 	setReady: (ready: boolean) => void;

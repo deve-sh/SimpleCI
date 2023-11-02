@@ -20,6 +20,7 @@ import auth from "../providers/auth";
 const COLLECTION_NAME = "simpleci-projects";
 
 export interface Project {
+	id: string;
 	name: string;
 	repositoryId: string | number;
 	repositoryName: string;
@@ -83,11 +84,7 @@ export const getUserProjectsQuery = () => {
 	return {
 		query: projectsQuery,
 		processData: (snapshot: QuerySnapshot<DocumentData, DocumentData>) =>
-			snapshot.docs.map((project) => ({
-				...(project.data() as Project),
-				createdAt: project.get("createdAt").toDate(),
-				updatedAt: project.get("updatedAt").toDate(),
-			})),
+			snapshot.docs.map((project) => project.data() as Project),
 	};
 };
 
@@ -99,11 +96,9 @@ export const getUserProjectByRepoId = async (repoId: string | number) => {
 			where("repositoryId", "==", repoId),
 			limit(1)
 		);
-		const projects = (await getDocs(projectQuery)).docs.map((project) => ({
-			...(project.data() as Project),
-			createdAt: project.get("createdAt").toDate(),
-			updatedAt: project.get("updatedAt").toDate(),
-		}));
+		const projects = (await getDocs(projectQuery)).docs.map((project) =>
+			project.data() as Project
+		);
 		return { error: null, data: projects[0] };
 	} catch (error) {
 		return { error, data: null };
