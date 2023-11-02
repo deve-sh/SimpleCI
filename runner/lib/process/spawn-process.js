@@ -42,12 +42,12 @@ class SpawnedProcess {
 			if (runInfo.env.hasOwnProperty(envVar)) {
 				const envVarValue = runInfo.env[processedLogString];
 				processedLogString = processedLogString.replace(
-					logString[envVarValue],
+					new RegExp(logString[envVarValue], "g"),
 					"*".repeat(Math.min(envVarValue.length, 6))
 				);
 			}
 		}
-		
+
 		const newLog = {
 			type: severity,
 			log: processedLogString,
