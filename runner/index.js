@@ -2,7 +2,6 @@ const functions = require("firebase-functions");
 
 const runnerSettings = {
 	standard: {
-		region: "asia-south1",
 		timeoutSeconds: 150,
 		memory: "1GB",
 	},
