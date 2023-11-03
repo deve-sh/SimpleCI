@@ -4,7 +4,7 @@ let writeTimeout = null;
 
 const reportSteps = async () => {
 	// Fire and forget function
-    
+
 	if (writeTimeout) writeTimeout = clearTimeout(writeTimeout);
 
 	const admin = require("../../firebase/admin");
@@ -15,10 +15,7 @@ const reportSteps = async () => {
 		.firestore()
 		.collection("simpleci-runs")
 		.doc(runInfo.runId)
-		.set(
-			{ stepsExecuted: runInfo.stepsOutcome, updatedAt: new Date() },
-			{ merge: true }
-		)
+		.update({ stepsExecuted: runInfo.stepsOutcome, updatedAt: new Date() })
 		.catch(console.error);
 };
 

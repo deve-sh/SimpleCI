@@ -9,6 +9,8 @@ const appendLog = async (
 	 */
 	log
 ) => {
+	appendQueue.push(log);
+
 	if (writeTimeout) writeTimeout = clearTimeout(writeTimeout);
 
 	// Fire and forget function
@@ -18,7 +20,7 @@ const appendLog = async (
 	const admin = require("../../firebase/admin");
 	const runInfo = require("../run-info");
 
-	// This writes to the document each time there is a log or at very small intervals of 1000 ms, debouncing bursts of logs from a step
+	// This writes to the document each time there is a log or at very small intervals of 200 ms, debouncing bursts of logs from a step
 	writeTimeout = setTimeout(async () => {
 		const logsToWriteToDB = JSON.parse(JSON.stringify(appendQueue));
 		// Empty queue for next write burst
@@ -32,7 +34,7 @@ const appendLog = async (
 				// Add back logs to the start for retry with next write burst
 				appendQueue = [...logsToWriteToDB, ...appendQueue];
 			});
-	}, 1000);
+	}, 200);
 };
 
 module.exports = appendLog;

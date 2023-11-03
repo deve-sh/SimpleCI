@@ -17,14 +17,12 @@ const reportOutcome = async () => {
 		.firestore()
 		.collection("simpleci-runs")
 		.doc(runId)
-		.set(
-			{
-				status: anyStepErrored ? "errored" : "finished",
-				stepsExecuted: runInfo.stepsOutcome,
-				updatedAt: new Date(),
-			},
-			{ merge: true }
-		);
+		.update({
+			status: anyStepErrored ? "errored" : "finished",
+			stepsExecuted: runInfo.stepsOutcome,
+			updatedAt: new Date(),
+		})
+		.catch(console.error);
 };
 
 module.exports = reportOutcome;
