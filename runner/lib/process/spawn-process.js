@@ -36,9 +36,9 @@ class SpawnedProcess {
 		let processedLogString = logString;
 		for (const envVar in runInfo.env) {
 			if (runInfo.env.hasOwnProperty(envVar)) {
-				const envVarValue = runInfo.env[processedLogString];
+				const envVarValue = runInfo.env[envVar];
 				processedLogString = processedLogString.replace(
-					new RegExp(logString[envVarValue], "g"),
+					new RegExp(envVarValue, "g"),
 					"*".repeat(Math.min(envVarValue.length, 6))
 				);
 			}
