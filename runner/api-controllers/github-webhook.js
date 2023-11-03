@@ -18,8 +18,6 @@ const gitHubWebhook = async (
 
 		const { config } = require("firebase-functions/v1");
 
-		console.log(req.rawBody, req.body);
-
 		const { Webhooks } = require("@octokit/webhooks");
 		const webhooks = new Webhooks({ secret: config().github.webhook_secret });
 		const signature = await webhooks.sign(req.rawBody.toString());
