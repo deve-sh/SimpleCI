@@ -147,7 +147,7 @@ const gitHubWebhook = async (
 				context: {
 					event: getFromRequestHeader("X-GitHub-Event") || req.body.action,
 					branchName: branchOrTagName,
-					...req.body,
+					...runContext,
 				},
 			},
 		});
