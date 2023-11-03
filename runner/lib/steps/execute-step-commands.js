@@ -32,7 +32,7 @@ const executeStepCommands = async (initialData) => {
 			(step.condition &&
 				(await evaluateExpression(step.condition)).resolvedValue)
 		) {
-			runInfo.markNewStep({
+			await runInfo.markNewStep({
 				stepName: step.name || `Step Number ${stepIndex + 1}`,
 			});
 
@@ -45,11 +45,10 @@ const executeStepCommands = async (initialData) => {
 					await executeIndividualCommand(step.run, initialData.runId);
 			} catch {
 				// Error thrown in step, terminate execution here and move to unsetting and reporting step
-				runInfo.markStepEnd("errored");
-				return;
+				return await runInfo.markStepEnd("errored");
 			}
 
-			runInfo.markStepEnd();
+			await runInfo.markStepEnd();
 		}
 	}
 };

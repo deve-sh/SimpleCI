@@ -41,7 +41,7 @@ class RunInfo {
 		return !currentStep || currentStep.status !== "errored";
 	};
 
-	markNewStep = (
+	markNewStep = async (
 		/**
 		 * @type { Partial<typeof this.stepsOutcome[number]> }
 		 */
@@ -63,13 +63,13 @@ class RunInfo {
 		});
 
 		const reportSteps = require("./reporters/report-steps");
-		reportSteps();
+		await reportSteps();
 	};
 
 	/**
-	 * @type {(status?:'errored' | 'finished', options?: { force?: boolean }) => void}
+	 * @type {(status?:'errored' | 'finished', options?: { force?: boolean }) => Promise<void>}
 	 */
-	markStepEnd = (status = "finished", { force = false } = {}) => {
+	markStepEnd = async (status = "finished", { force = false } = {}) => {
 		if (!this.inProgress() && !force) return;
 
 		const currentStep = this.stepsOutcome[this.stepsOutcome.length - 1];
@@ -82,7 +82,7 @@ class RunInfo {
 		};
 
 		const reportSteps = require("./reporters/report-steps");
-		reportSteps();
+		await reportSteps();
 	};
 
 	addLogToCurrentStep = (

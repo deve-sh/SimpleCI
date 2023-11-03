@@ -16,7 +16,7 @@ const executePipeline = async (initialData, timeoutSeconds) => {
 
 	// Teardown and timeout handling
 	let alreadyReportedAndTornDown = false;
-	let timeout = setTimeout(() => {
+	let timeout = setTimeout(async () => {
 		if (alreadyReportedAndTornDown) return (timeout = clearTimeout(timeout));
 
 		if (
@@ -29,10 +29,10 @@ const executePipeline = async (initialData, timeoutSeconds) => {
 				log: "Could not complete CI pipeline in the required timeframe.",
 				ts: new Date().toISOString(),
 			});
-			runInfo.markStepEnd("errored");
+			await runInfo.markStepEnd("errored");
 		}
 
-		teardownAndReport({ fromTimeout: true });
+		await teardownAndReport({ fromTimeout: true });
 	}, Math.max(MINIMUM_TIMEOUT_SECONDS, timeoutSeconds - 4.5) * 1000);
 
 	/**
@@ -51,7 +51,7 @@ const executePipeline = async (initialData, timeoutSeconds) => {
 
 			if (timeout) timeout = clearInterval(timeout);
 
-			runInfo.markNewStep(
+			await runInfo.markNewStep(
 				{ stepName: "Teardown and Reporting" },
 				{ force: true }
 			);
@@ -59,7 +59,7 @@ const executePipeline = async (initialData, timeoutSeconds) => {
 			removeClonedFiles();
 			removeTemporaryEnvironmentVariables();
 
-			runInfo.markStepEnd("finished", { force: true });
+			await runInfo.markStepEnd("finished", { force: true });
 			await reportOutcome();
 		} catch (error) {
 			console.error(error);
@@ -72,14 +72,14 @@ const executePipeline = async (initialData, timeoutSeconds) => {
 	//#region Actual execution
 	let setupIsErrored = false;
 	try {
-		runInfo.markNewStep({ stepName: "Setup" });
+		await runInfo.markNewStep({ stepName: "Setup" });
 		removeTemporaryEnvironmentVariables = await setupEnvAndContexts(
 			initialData
 		);
 		removeClonedFiles = await cloneRepo(initialData);
-		runInfo.markStepEnd();
+		await runInfo.markStepEnd();
 	} catch (error) {
-		runInfo.markStepEnd("errored");
+		await runInfo.markStepEnd("errored");
 		setupIsErrored = true;
 	}
 
