@@ -13,7 +13,7 @@ const reportSteps = async () => {
 	// Empty queue for next write burst
 	return admin
 		.firestore()
-		.collection("runs")
+		.collection("simpleci-runs")
 		.doc(runInfo.runId)
 		.set(
 			{ stepsExecuted: runInfo.stepsOutcome, updatedAt: new Date() },

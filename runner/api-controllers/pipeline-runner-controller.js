@@ -25,7 +25,7 @@ const pipelineRunnerController =
 		const admin = require("../firebase/admin");
 
 		const runDocumentData = (
-			await admin.firestore().collection("runs").doc(runId).get()
+			await admin.firestore().collection("simpleci-runs").doc(runId).get()
 		).data();
 		if (!runDocumentData) return;
 

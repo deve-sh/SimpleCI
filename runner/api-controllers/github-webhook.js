@@ -75,20 +75,40 @@ const gitHubWebhook = async (
 		let ciFileContents = {};
 		try {
 			const params = {};
-			if (req.body.base_ref) params["ref"] = req.body.base_ref;
+			if (req.body.base_ref || req.body.ref)
+				params["ref"] =
+					req.body.base_ref ||
+					req.body.ref.split("refs/heads/").pop() ||
+					req.body.ref.split("refs/tags/").pop();
 			const ciFileResponse = await axios.get(
 				`https://api.github.com/repos/${projectData.providerSpecificContext.owner}/${projectData.repositoryName}/contents/.simpleci/pipeline.json`,
-				{ headers: { Accept: "application/vnd.github.v3.raw" }, params }
+				{
+					headers: {
+						Accept: "application/vnd.github.v3.raw",
+						Authorization: projectData.token
+							? `Bearer ${projectData.token}`
+							: "",
+					},
+					transformResponse: undefined,
+					responseType: "text",
+					params,
+				}
 			);
 			ciFileContents = JSON.parse(ciFileResponse.data);
-		} catch {
-			// Failed to fetch or parse
+		} catch (error) {
 			return invalidInvocationError(
-				"Failed to parse or find SimpleCI pipeline file in the repository"
+				"Failed to parse or find SimpleCI pipeline file in the repository: " +
+					error.message
 			);
 		}
 
-		batch.set(db.collection("runs").doc(runId), {
+		const runContext = { ...req.body };
+
+		delete runContext.repository;
+		delete runContext.organization;
+		delete runContext.enterprise;
+
+		batch.set(db.collection("simpleci-runs").doc(runId), {
 			runId,
 			project: projectId,
 			associatedWebhook: webhookId,

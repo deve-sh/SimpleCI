@@ -15,7 +15,7 @@ const reportOutcome = async () => {
 	const admin = require("../../firebase/admin");
 	await admin
 		.firestore()
-		.collection("runs")
+		.collection("simpleci-runs")
 		.doc(runId)
 		.set(
 			{
