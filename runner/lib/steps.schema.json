@@ -13,7 +13,7 @@
 			"items": {
 				"type": "object",
 				"title": "A Schema",
-				"required": ["name", "condition", "run"],
+				"required": ["name", "run"],
 				"properties": {
 					"name": {
 						"type": "string",
