@@ -102,6 +102,20 @@ const gitHubWebhook = async (
 			);
 		}
 
+		// Validate steps schema
+		const schema = require("../lib/steps.schema.json");
+		const { Validator } = require("jsonschema");
+		const jsonSchemaValidator = new Validator();
+		const validatedSchema = jsonSchemaValidator.validate(
+			ciFileContents,
+			schema
+		);
+		if (validatedSchema.errors.length)
+			return invalidInvocationError(
+				"Invalid SimpleCI Schema file: \n" +
+					validatedSchema.errors.map((error) => error.stack).join("\n")
+			);
+
 		const runContext = { ...req.body };
 
 		delete runContext.repository;
