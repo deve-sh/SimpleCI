@@ -11,10 +11,14 @@ const gitHubWebhook = async (
 	res
 ) => {
 	try {
-		const invalidInvocationError = () =>
-			res.status(400).send({ error: "Invalid webhook invocation" });
+		const invalidInvocationError = (error = "") =>
+			res
+				.status(400)
+				.send({ error: "Invalid webhook invocation", errorMessage: error });
 
 		const { config } = require("firebase-functions/v1");
+
+		console.log(req.rawBody, req.body);
 
 		const { Webhooks } = require("@octokit/webhooks");
 		const webhooks = new Webhooks({ secret: config().github.webhook_secret });
@@ -44,14 +48,16 @@ const gitHubWebhook = async (
 
 		const webhookId = getFromRequestHeader("X-GitHub-Hook-ID");
 
-		if (!webhookId) return invalidInvocationError();
+		if (!webhookId)
+			return invalidInvocationError("No webhook ID present in request");
 
 		// Get the webhook
 		const webhook = await db
 			.collection("simpleci-registered-webhooks")
 			.doc(webhookId.toString())
 			.get();
-		if (!webhook.exists || !webhook.data()) return invalidInvocationError();
+		if (!webhook.exists || !webhook.data())
+			return invalidInvocationError("Webhook not found");
 
 		// Get the project
 		const projectId = webhook.data()?.project;
@@ -60,7 +66,8 @@ const gitHubWebhook = async (
 			.doc(projectId)
 			.get();
 		const projectData = project.data();
-		if (!project.exists || !projectData) return invalidInvocationError();
+		if (!project.exists || !projectData)
+			return invalidInvocationError("Project not found");
 
 		// Read CI Pipeline file from repo.
 		const { default: axios } = require("axios");
@@ -78,7 +85,9 @@ const gitHubWebhook = async (
 			ciFileContents = JSON.parse(ciFileResponse.data);
 		} catch {
 			// Failed to fetch or parse
-			return invalidInvocationError();
+			return invalidInvocationError(
+				"Failed to parse or find SimpleCI pipeline file in the repository"
+			);
 		}
 
 		batch.set(db.collection("runs").doc(runId), {
@@ -115,9 +124,10 @@ const gitHubWebhook = async (
 
 		await batch.commit();
 
-		return;
+		return res.send({ success: true });
 	} catch (error) {
 		console.error(error);
+		return res.send({ success: false });
 	}
 };
 
