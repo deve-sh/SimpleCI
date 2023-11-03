@@ -151,6 +151,7 @@ const gitHubWebhook = async (
 				},
 			},
 		});
+		batch.set(db.collection("simpleci-run-logs").doc(runId), { logs: [] });
 
 		const runnerPreference = projectData.config.runnerPreference || "standard";
 		// This triggers a pub-sub based background start of the pipeline runner.

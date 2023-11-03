@@ -29,12 +29,13 @@ const appendLog = async (
 			.firestore()
 			.collection("simpleci-run-logs")
 			.doc(runInfo.runId)
-			.set({ logs: FieldValue.arrayUnion(log) }, { merge: true })
-			.catch(() => {
+			.update({ logs: FieldValue.arrayUnion(log) })
+			.catch((error) => {
+				console.log("Error writing logs to run: ", runInfo.runId, error);
 				// Add back logs to the start for retry with next write burst
 				appendQueue = [...logsToWriteToDB, ...appendQueue];
 			});
-	}, 200);
+	}, 205);
 };
 
 module.exports = appendLog;

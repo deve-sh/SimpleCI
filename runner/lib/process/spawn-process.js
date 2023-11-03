@@ -6,16 +6,12 @@ class SpawnedProcess {
 	 */
 	process = null;
 	/**
-	 * @type {{type: 'error' | 'info', log: string }[]}
-	 */
-	outputLogs = [];
-	/**
 	 * @type {'errored' | 'finished' | 'in-progress'}
 	 */
 	finalStatus = "in-progress";
 
 	/**
-	 * @type { Set<((newLog: typeof this.outputLogs[number]) => void)> }
+	 * @type { Set<((newLog: {type: 'error' | 'info', log: string }) => void)> }
 	 */
 	onLog = new Set();
 
@@ -54,9 +50,7 @@ class SpawnedProcess {
 			ts: new Date().toISOString(),
 		};
 
-		this.outputLogs.push(newLog);
 		this.onLog.forEach((subscriber) => subscriber(newLog));
-
 		runInfo.addLogToCurrentStep(newLog);
 	};
 
