@@ -11,7 +11,7 @@ const runInfo = require("./run-info");
 // A minimum time limit of 100 seconds for each CI Runner
 const MINIMUM_TIMEOUT_SECONDS = 100;
 
-const executePipeline = async (initialData, timeoutSeconds) => {
+const executePipeline = async (initialData, timeoutSeconds = MINIMUM_TIMEOUT_SECONDS) => {
 	runInfo.runId = initialData.runId;
 
 	// Teardown and timeout handling

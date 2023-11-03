@@ -58,11 +58,18 @@ class SpawnedProcess {
 		/**
 		 * @type {string}
 		 */
-		command
+		command,
+		/**
+		 * @type {string}
+		 */
+		workingDirectory = ""
 	) {
 		const { spawn } = require("child_process");
 
-		this.process = spawn(command, { shell: true });
+		this.process = spawn(command, {
+			shell: true,
+			cwd: workingDirectory || undefined,
+		});
 
 		this.process.stdout.on("data", this.addToLogs("info"));
 		this.process.stderr.on("data", this.addToLogs("error"));

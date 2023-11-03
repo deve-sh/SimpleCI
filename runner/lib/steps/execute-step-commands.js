@@ -1,9 +1,5 @@
 // @ts-check
 
-const runInfo = require("../run-info");
-const evaluateExpression = require("../process/evaluate-expression");
-const SpawnedProcess = require("../process/spawn-process");
-
 /**
  *
  * @param {string} command
@@ -12,8 +8,9 @@ const SpawnedProcess = require("../process/spawn-process");
  */
 const executeIndividualCommand = (command, runId) =>
 	new Promise((resolve, reject) => {
-		// before each command, make sure we're in the directory of the app we want to run ci for.
-		const process = new SpawnedProcess(`cd /tmp/${runId}/ci-cd-app; ${command}`);
+		const SpawnedProcess = require("../process/spawn-process");
+		const clonedRepoWorkingDirectory = `/tmp/${runId}/ci-cd-app`;
+		const process = new SpawnedProcess(command, clonedRepoWorkingDirectory);
 		process.on("complete", (status) => {
 			if (status === "errored") reject();
 			else resolve();
@@ -24,9 +21,11 @@ const executeIndividualCommand = (command, runId) =>
  * @type {(initialData: { runId: string, steps: any[] }) => Promise<void>}
  */
 const executeStepCommands = async (initialData) => {
+	const runInfo = require("../run-info");
 	const steps = initialData.steps;
 	let stepIndex = 1;
 	for (const step of steps) {
+		const evaluateExpression = require("../process/evaluate-expression");
 		if (
 			!step.condition ||
 			(step.condition &&
