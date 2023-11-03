@@ -67,6 +67,14 @@ const gitHubWebhook = async (
 		if (!project.exists || !projectData)
 			return invalidInvocationError("Project not found");
 
+		const branchOrTagName =
+			req.body.base_ref || req.body.ref
+				? req.body.base_ref ||
+				  req.body.ref.split("refs/heads/").pop() ||
+				  req.body.ref.split("refs/tags/").pop() ||
+				  ""
+				: "";
+
 		// Read CI Pipeline file from repo.
 		const { default: axios } = require("axios");
 		/**
@@ -74,12 +82,8 @@ const gitHubWebhook = async (
 		 */
 		let ciFileContents = {};
 		try {
-			const params = {};
-			if (req.body.base_ref || req.body.ref)
-				params["ref"] =
-					req.body.base_ref ||
-					req.body.ref.split("refs/heads/").pop() ||
-					req.body.ref.split("refs/tags/").pop();
+			const params = { ref: branchOrTagName };
+
 			const ciFileResponse = await axios.get(
 				`https://api.github.com/repos/${projectData.providerSpecificContext.owner}/${projectData.repositoryName}/contents/.simpleci/pipeline.json`,
 				{
@@ -142,7 +146,7 @@ const gitHubWebhook = async (
 				// For now the user can use whatever they get from payload as defined in https://docs.github.com/en/webhooks/webhook-events-and-payload
 				context: {
 					event: getFromRequestHeader("X-GitHub-Event") || req.body.action,
-					branchName: req.body.base_ref || "",
+					branchName: branchOrTagName,
 					...req.body,
 				},
 			},
