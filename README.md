@@ -2,7 +2,7 @@
 
 A simple implementation of a CI Pipeline runner based on Webhooks provided by Git Providers like GitHub.
 
-For the whole blog post, check [here](to-add).
+For the whole blog post, check [here](https://blog.devesh.tech/post/lets-build-our-own-ci-job-runner).
 
 For the actual server and runner implementation, check out [the runner directory](../runner/README.md).
 
