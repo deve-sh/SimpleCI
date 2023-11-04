@@ -3,7 +3,7 @@ import { useCallback } from "react";
 import { useAuth } from "../../providers/auth";
 import { getUserProjectById } from "../projects";
 
-import useFetch from "./use-fetch";
+import useFetch from "./abstractions/use-fetch";
 
 const useProject = (projectId: string | null) => {
 	const { user } = useAuth();

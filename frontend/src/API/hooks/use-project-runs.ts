@@ -1,5 +1,5 @@
 import { getProjectRunsQuery, type Run } from "../runs";
-import useRealtimeFirestoreQuery from "./use-realtime-value";
+import useRealtimeFirestoreQuery from "./abstractions/use-realtime-firestore-query";
 
 const useProjectRuns = (projectId: string) => {
 	const { data: runs, ...rest } = useRealtimeFirestoreQuery<Run>(

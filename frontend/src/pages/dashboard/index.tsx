@@ -1,5 +1,5 @@
 import { Navigate, useOutlet } from "react-router-dom";
-import { VStack } from "@chakra-ui/react";
+import { Button, Flex, VStack } from "@chakra-ui/react";
 
 import auth, { useAuth } from "../../providers/auth";
 
@@ -10,7 +10,13 @@ const UserDashboard = () => {
 	const { user } = useAuth();
 	const Outlet = useOutlet();
 
-	const Header = <button onClick={() => auth.logout()}>Sign Out</button>;
+	const Header = (
+		<Flex width="100%" justifyContent="flex-end">
+			<Button colorScheme="red" onClick={() => auth.logout()}>
+				Sign Out
+			</Button>
+		</Flex>
+	);
 
 	const Body = Outlet || (
 		<>

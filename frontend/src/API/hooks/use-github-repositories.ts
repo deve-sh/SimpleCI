@@ -1,6 +1,6 @@
 import { useAuth } from "../../providers/auth";
 import githubProvider from "../../providers/git-provider/github";
-import useFetch from "./use-fetch";
+import useFetch from "./abstractions/use-fetch";
 
 const useGitHubRepositories = () => {
 	const { user } = useAuth();

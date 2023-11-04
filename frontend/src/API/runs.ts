@@ -1,13 +1,13 @@
 import {
 	doc,
 	collection,
-	getDoc,
 	where,
 	query,
 	orderBy,
 	limit,
 	type DocumentData,
 	type QuerySnapshot,
+	type Timestamp,
 } from "firebase/firestore";
 
 import db from "../providers/database";
@@ -17,6 +17,7 @@ const LOGS_COLLECTION_NAME = "simpleci-run-logs";
 
 export interface Run {
 	runId: string;
+	updatedAt: Timestamp;
 	projectId: string;
 	status: "in-progress" | "errored" | "finished";
 	associatedWebhook: string | number;
@@ -33,7 +34,7 @@ export interface Run {
 export interface Log {
 	stepId: string;
 	type: "error" | "info" | "warning";
-	logString: string;
+	log: string;
 	ts: string; // Timestamp
 }
 
@@ -51,12 +52,7 @@ export const getProjectRunsQuery = (projectId: string) => {
 	};
 };
 
-export const getRunLogs = async (runId: string) => {
-	try {
-		const runLogsDoc = doc(db, LOGS_COLLECTION_NAME, runId);
-		const runLogs = await getDoc(runLogsDoc);
-		return { error: null, data: runLogs.data() as { logs: Log[] } };
-	} catch (error) {
-		return { error, data: null };
-	}
+export const getRunLogsReference = (runId: string) => {
+	const runLogsDoc = doc(db, LOGS_COLLECTION_NAME, runId);
+	return { doc: runLogsDoc };
 };

@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
 import { onSnapshot, type DocumentData, type Query } from "firebase/firestore";
 
-import { useAuth } from "../../providers/auth";
+import { useAuth } from "../../../providers/auth";
 
 const useRealtimeFirestoreQuery = <T>(
 	query: Query<DocumentData, DocumentData>
 ) => {
 	const { user } = useAuth();
 
-	const [loading, setLoading] = useState(false);
+	const [isLoading, setLoading] = useState(false);
 	const [error, setError] = useState<Error | null>(null);
 	const [data, setData] = useState<T[]>([]);
 
@@ -20,7 +20,7 @@ const useRealtimeFirestoreQuery = <T>(
 			query,
 			(snapshot) => {
 				setLoading(false);
-				setData(snapshot.docs.map((run) => run.data() as T));
+				setData(snapshot.docs.map((doc) => doc.data() as T));
 			},
 			setError
 		);
@@ -28,9 +28,9 @@ const useRealtimeFirestoreQuery = <T>(
 		return () => {
 			if (unsubFunction) unsubFunction();
 		};
-	}, [user?.uid, query]);
+	}, [user?.uid]);
 
-	return { data, error, loading };
+	return { data, error, isLoading };
 };
 
 export default useRealtimeFirestoreQuery;

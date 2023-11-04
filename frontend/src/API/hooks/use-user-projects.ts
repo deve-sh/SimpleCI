@@ -1,5 +1,5 @@
 import { getUserProjectsQuery, type Project } from "../projects";
-import useRealtimeFirestoreQuery from "./use-realtime-value";
+import useRealtimeFirestoreQuery from "./abstractions/use-realtime-firestore-query";
 
 const useUserProjects = () => {
 	const { data: projects, ...rest } = useRealtimeFirestoreQuery<Project>(

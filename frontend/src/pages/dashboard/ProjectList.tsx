@@ -14,10 +14,10 @@ import {
 import useUserProjects from "../../API/hooks/use-user-projects";
 
 const ProjectList = () => {
-	const { projects, loading, error } = useUserProjects();
+	const { projects, isLoading, error } = useUserProjects();
 
 	if (error) return <>Failed to fetch projects. Reason: {error.message}</>;
-	if (loading)
+	if (isLoading)
 		return (
 			<Grid
 				gap="4"

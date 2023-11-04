@@ -9,6 +9,7 @@ import { useSetGitHubCredentials } from "./providers/git-provider/github";
 const Home = lazy(() => import("./pages/home"));
 const UserDashboard = lazy(() => import("./pages/dashboard"));
 const ProjectDashboard = lazy(() => import("./pages/dashboard/project"));
+const ProjectCIRunInfo = lazy(() => import("./pages/dashboard/project-ci-run"));
 
 function App() {
 	// Unsubscribe from auth on unmount
@@ -24,6 +25,7 @@ function App() {
 						<Route path="/" Component={Home} />
 						<Route path="/dashboard" Component={UserDashboard}>
 							<Route path="project/:projectId" Component={ProjectDashboard} />
+							<Route path="run/:runId" Component={ProjectCIRunInfo} />
 						</Route>
 					</Routes>
 				</Suspense>
