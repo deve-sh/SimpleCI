@@ -100,8 +100,8 @@ class RunInfo {
 		this.logPool.push(logEntry);
 
 		// Add to a database or append to a log file.
-		const appendLog = require("./reporters/append-log");
-		appendLog(logEntry);
+		const reportLogs = require("./reporters/report-logs");
+		reportLogs();
 	};
 }
 
