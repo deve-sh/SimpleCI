@@ -1,45 +1,34 @@
-import { useEffect } from "react";
-import { ChakraProvider, Button } from "@chakra-ui/react";
-import { FaGithub } from "react-icons/fa";
+import { useEffect, lazy, Suspense } from "react";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { ChakraProvider } from "@chakra-ui/react";
 
-import auth, { useAuth } from "./providers/auth";
+import auth from "./providers/auth";
 import { useSetGitHubCredentials } from "./providers/git-provider/github";
 
 // Routes and Components
-import UserDashboard from "./pages/dashboard";
+const Home = lazy(() => import("./pages/home"));
+const UserDashboard = lazy(() => import("./pages/dashboard"));
+const ProjectDashboard = lazy(() => import("./pages/dashboard/project"));
 
 function App() {
-	const { user, signingIn } = useAuth();
-
 	// Unsubscribe from auth on unmount
 	useEffect(() => auth.destroy, []);
 
 	useSetGitHubCredentials();
 
 	return (
-		<ChakraProvider>
-			{!user && (
-				<Button
-					padding="8"
-					size="lg"
-					colorScheme="white"
-					background="blackAlpha.800"
-					leftIcon={<FaGithub fontSize="2rem" />}
-					isLoading={signingIn}
-					disabled={signingIn}
-					onClick={() => auth.loginWithPopup("github")}
-				>
-					&nbsp;Sign In With GitHub
-				</Button>
-			)}
-			&nbsp;
-			{user && (
-				<>
-					<button onClick={() => auth.logout()}>Sign Out</button>
-					<UserDashboard />
-				</>
-			)}
-		</ChakraProvider>
+		<BrowserRouter>
+			<ChakraProvider>
+				<Suspense fallback={null}>
+					<Routes>
+						<Route path="/" Component={Home} />
+						<Route path="/dashboard" Component={UserDashboard}>
+							<Route path="project/:projectId" Component={ProjectDashboard} />
+						</Route>
+					</Routes>
+				</Suspense>
+			</ChakraProvider>
+		</BrowserRouter>
 	);
 }
 

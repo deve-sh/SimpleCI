@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { FiClock } from "react-icons/fi";
 import {
 	Card,
@@ -43,34 +44,34 @@ const ProjectList = () => {
 			}}
 		>
 			{projects.map((project) => (
-				// <Link to={`/project/${project.id}`}>
-				<Card
-					height="100%"
-					minWidth="25%"
-					key={project.id}
-					_hover={{ boxShadow: "lg" }}
-				>
-					<CardHeader>
-						<Heading size="md" noOfLines={1}>
-							{project.name}
-						</Heading>
-					</CardHeader>
-					<CardBody width="100%" pr="0">
-						<Flex mt="4">
-							<Text
-								fontSize="0.75rem"
-								display="flex"
-								alignItems="center"
-								gap="2"
-								color="gray.500"
-								flex="0.75"
-							>
-								<FiClock /> {project.createdAt?.toDate?.().toDateString()}
-							</Text>
-						</Flex>
-					</CardBody>
-				</Card>
-				// </Link>
+				<Link to={`/dashboard/project/${project.id}`}>
+					<Card
+						height="100%"
+						minWidth="25%"
+						key={project.id}
+						_hover={{ boxShadow: "lg" }}
+					>
+						<CardHeader>
+							<Heading size="md" noOfLines={1}>
+								{project.name}
+							</Heading>
+						</CardHeader>
+						<CardBody width="100%" pr="0">
+							<Flex mt="4">
+								<Text
+									fontSize="0.75rem"
+									display="flex"
+									alignItems="center"
+									gap="2"
+									color="gray.500"
+									flex="0.75"
+								>
+									<FiClock /> {project.createdAt?.toDate?.().toDateString()}
+								</Text>
+							</Flex>
+						</CardBody>
+					</Card>
+				</Link>
 			))}
 		</Grid>
 	);
