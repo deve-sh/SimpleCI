@@ -4,6 +4,7 @@ import {
 	serverTimestamp,
 	collection,
 	getDocs,
+	getDoc,
 	where,
 	query,
 	orderBy,
@@ -96,10 +97,20 @@ export const getUserProjectByRepoId = async (repoId: string | number) => {
 			where("repositoryId", "==", repoId),
 			limit(1)
 		);
-		const projects = (await getDocs(projectQuery)).docs.map((project) =>
-			project.data() as Project
+		const projects = (await getDocs(projectQuery)).docs.map(
+			(project) => project.data() as Project
 		);
 		return { error: null, data: projects[0] };
+	} catch (error) {
+		return { error, data: null };
+	}
+};
+
+export const getUserProjectById = async (projectId: string) => {
+	try {
+		const projectDoc = doc(db, COLLECTION_NAME, projectId);
+		const project = await getDoc(projectDoc);
+		return { error: null, data: project.data() as Project };
 	} catch (error) {
 		return { error, data: null };
 	}
