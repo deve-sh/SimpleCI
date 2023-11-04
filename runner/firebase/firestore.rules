@@ -6,14 +6,24 @@ service cloud.firestore {
       return request.auth != null && request.auth.uid != null;
     }
     
+    function hasAccessToProject (projectData) {
+    	return request.auth.uid in projectData.members;
+    }
+    
     match /simpleci-projects/{projectId} {
-      allow read: if isSignedIn();
-      allow update, delete: if isSignedIn() &&
-        resource.data.members.hasAll([request.auth.uid]) &&
-        resource.data.createdBy == request.auth.uid;
-      allow create: if isSignedIn() && 
-        request.resource.data.members.hasAll([request.auth.uid]) &&
-        request.resource.data.createdBy == request.auth.uid;
+      allow read: if isSignedIn() && hasAccessToProject(resource.data);
+      allow update, delete: if isSignedIn() && hasAccessToProject(resource.data);
+      allow create: if isSignedIn() && hasAccessToProject(request.resource.data);
+    }
+    
+    match /simpleci-runs/{runId} {
+      allow list: if isSignedIn() && hasAccessToProject(
+      	get(/databases/$(database)/documents/simpleci-projects/$(resource.data.project)).data
+      );
+    }
+    
+    match /simpleci-run-logs/{runId} {
+      allow get: if isSignedIn();
     }
   }
 }
