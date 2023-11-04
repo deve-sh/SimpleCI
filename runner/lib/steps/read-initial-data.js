@@ -2,8 +2,11 @@
 
 const readInitialData = () => {
 	/**
-	 * @type { {
+	 * @type {{
 	 * 	repositoryURI: string;
+	 *  sha: string;
+	 *  repositoryName: string;
+	 *  owner: string;
 	 * 	token: string;
 	 * 	runId: string;
 	 * 	project: string,

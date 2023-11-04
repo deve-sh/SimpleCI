@@ -12,17 +12,21 @@ const reportOutcome = async () => {
 	);
 	const runId = runInfo.runId;
 
+	const createCommitStatus = require("../reporters/create-commit-status");
+	const finalStatus = anyStepErrored ? "errored" : "finished";
 	const admin = require("../../firebase/admin");
 	await admin
 		.firestore()
 		.collection("simpleci-runs")
 		.doc(runId)
 		.update({
-			status: anyStepErrored ? "errored" : "finished",
+			status: finalStatus,
 			stepsExecuted: runInfo.stepsOutcome,
 			updatedAt: new Date(),
 		})
 		.catch(console.error);
+
+	await createCommitStatus("github", finalStatus);
 };
 
 module.exports = reportOutcome;

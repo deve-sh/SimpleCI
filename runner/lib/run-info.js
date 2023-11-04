@@ -5,6 +5,10 @@ class RunInfo {
 	 * @type { string }
 	 */
 	runId;
+	/**
+	 * @type { ReturnType<typeof import('./steps/read-initial-data')>}
+	 */
+	initialData;
 
 	/**
 	 * @type {{

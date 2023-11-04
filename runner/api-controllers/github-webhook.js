@@ -134,6 +134,10 @@ const gitHubWebhook = async (
 			// The initial data to use for the runner
 			initialData: {
 				runId,
+				repositoryName: projectData.repositoryName,
+				owner: projectData.providerSpecificContext.owner || "",
+				sha:
+					req.body.head_commit?.id || req.body.after || req.body.before || "",
 				repositoryURI: projectData.cloneURL,
 				token: projectData.token,
 				// Could also be read on the runner post cloning the repo.

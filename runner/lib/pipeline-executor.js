@@ -11,8 +11,15 @@ const runInfo = require("./run-info");
 // A minimum time limit of 100 seconds for each CI Runner
 const MINIMUM_TIMEOUT_SECONDS = 100;
 
-const executePipeline = async (initialData, timeoutSeconds = MINIMUM_TIMEOUT_SECONDS) => {
+const executePipeline = async (
+	/**
+	 * @type { ReturnType<typeof readInitialData>}
+	 */
+	initialData,
+	timeoutSeconds = MINIMUM_TIMEOUT_SECONDS
+) => {
 	runInfo.runId = initialData.runId;
+	runInfo.initialData = initialData;
 
 	// Teardown and timeout handling
 	let alreadyReportedAndTornDown = false;
@@ -78,6 +85,7 @@ const executePipeline = async (initialData, timeoutSeconds = MINIMUM_TIMEOUT_SEC
 		);
 		removeClonedFiles = await cloneRepo(initialData);
 		await runInfo.markStepEnd();
+		await createCommitStatus("github", finalStatus);
 	} catch (error) {
 		await runInfo.markStepEnd("errored");
 		setupIsErrored = true;
